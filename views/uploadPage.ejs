@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome, <%= name %></title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 1200px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+        }
+        h3 {
+            font-size: 20px;
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .upload-section,
+        .files-section {
+            width: 45%;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            height: 400px;
+            overflow-y: auto;
+        }
+        .file-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .file-upload input[type="file"] {
+            margin: 10px 0;
+        }
+        .uploaded-files {
+            list-style: none;
+            padding: 0;
+        }
+        .uploaded-files li {
+            padding: 5px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            margin: 5px 0;
+            font-size: 16px;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .uploaded-files li a {
+            text-decoration: none;
+            color: #007bff;
+            font-size: 14px;
+        }
+        .btn-submit {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            width: 100%;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        .btn-submit:hover {
+            background-color: #0056b3;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        #countdown-timer {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff4500;
+            background-color: #fff8e1;
+            border: 2px solid #ff4500;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+            text-align: center;
+            transition: all 0.3s ease-in-out;
+        }
+        #timer {
+            font-size: 24px;
+            color: #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Upload Section -->
+        <div class="upload-section">
+            <h3>Upload Files</h3>
+            <form id="uploadForm" action="/upload/<%= randomCode %>/<%= name %>" method="POST" enctype="multipart/form-data">
+                <div class="file-upload">
+                    <input type="file" name="file" id="fileInput" multiple required>
+                    <small>Max 5 files can be uploaded at a time.</small>
+                    <button type="submit" class="btn-submit">Upload File</button>
+                    <p class="error" id="fileError"></p>
+                </div>
+            </form>
+        </div>
+
+        <!-- Files Display Section -->
+        <div class="files-section">
+            <h3>Uploaded Files</h3>
+            <button id="deleteAllBtn" class="btn-submit">Delete All Files</button>
+            <ul class="uploaded-files" id="uploadedFiles"></ul>
+        </div>
+    </div>
+
+    <!-- Countdown Timer Section -->
+    <section class="countdown-timer-section">
+        <p id="countdown-timer">
+            Files will be deleted in <span id="timer">120</span> seconds.
+        </p>
+    </section>
+
+    <script>
+        const randomCode = '<%= randomCode %>';
+        const name = '<%= name %>';
+
+        const countdownDuration = 120; // seconds
+        const timerElement = document.getElementById("timer");
+        const countdownTimerElement = document.getElementById("countdown-timer");
+        countdownTimerElement.style.display = 'block';
+
+        // LocalStorage for timer persistence
+        let startTime = localStorage.getItem(`countdownStartTime-${randomCode}-${name}`);
+        if (!startTime) {
+            startTime = Date.now();
+            localStorage.setItem(`countdownStartTime-${randomCode}-${name}`, startTime);
+        }
+
+        const countdownInterval = setInterval(() => {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const remaining = countdownDuration - elapsed;
+
+            if (remaining > 0) {
+                timerElement.textContent = remaining;
+            } else {
+                clearInterval(countdownInterval);
+                timerElement.textContent = 0;
+
+                // Auto-delete all files
+                fetch(`/deleteAll/${randomCode}/${name}`, { method: 'DELETE' })
+                    .then(res => res.json())
+                    .then(data => {
+                        alert(data.message);
+                        uploadedFilesList.innerHTML = '';
+                        localStorage.removeItem(`countdownStartTime-${randomCode}-${name}`);
+                    })
+                    .catch(err => console.error('Error deleting files:', err));
+            }
+        }, 1000);
+
+        // File upload logic
+        const fileInput = document.getElementById('fileInput');
+        const fileError = document.getElementById('fileError');
+        const uploadForm = document.getElementById('uploadForm');
+        const uploadedFilesList = document.getElementById('uploadedFiles');
+        const deleteAllBtn = document.getElementById('deleteAllBtn');
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 5) {
+                fileError.textContent = 'You can upload a maximum of 5 files.';
+                fileInput.value = '';
+            } else {
+                fileError.textContent = '';
+            }
+        });
+
+        uploadForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData(uploadForm);
+            try {
+                const response = await fetch(uploadForm.action, { method: 'POST', body: formData });
+                if (response.ok) {
+                    const files = await response.json();
+                    displayUploadedFiles(files);
+                } else {
+                    const err = await response.json();
+                    alert(err.error || 'Upload error');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Upload error');
+            }
+        });
+
+        deleteAllBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch(`/deleteAll/${randomCode}/${name}`, { method: 'DELETE' });
+                if (response.ok) {
+                    const data = await response.json();
+                    alert(data.message);
+                    uploadedFilesList.innerHTML = '';
+                    localStorage.removeItem(`countdownStartTime-${randomCode}-${name}`);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        });
+
+        const displayUploadedFiles = (files) => {
+            uploadedFilesList.innerHTML = '';
+            files.forEach(file => {
+                const li = document.createElement('li');
+
+                const downloadLink = document.createElement('a');
+                downloadLink.href = `/download/${randomCode}/${name}/${file}`;
+                downloadLink.target = '_blank';
+                downloadLink.textContent = 'Download';
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.onclick = () => deleteFile(file);
+
+                li.textContent = file + ' ';
+                li.appendChild(downloadLink);
+                li.appendChild(deleteBtn);
+
+                uploadedFilesList.appendChild(li);
+            });
+        };
+
+        const deleteFile = async (fileName) => {
+            try {
+                const response = await fetch(`/delete/${randomCode}/${name}/${fileName}`, { method: 'DELETE' });
+                if (response.ok) {
+                    fetchFiles();
+                } else {
+                    const err = await response.json();
+                    alert(err.message || 'Error deleting file');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        const fetchFiles = async () => {
+            try {
+                const response = await fetch(`/files/${randomCode}/${name}`);
+                if (response.ok) {
+                    const files = await response.json();
+                    displayUploadedFiles(files);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', fetchFiles);
+    </script>
+</body>
+</html>

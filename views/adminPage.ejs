@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .button-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .btn-number {
+            font-size: 16px;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .btn-name {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            text-align: center;
+            flex-grow: 1;
+            transition: background-color 0.3s;
+        }
+
+        .btn-name:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-name.active {
+            background-color: orange; /* Orange when active */
+        }
+
+        .btn-back {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            width: 100%;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .btn-back:hover {
+            background-color: #e53935;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hello Admin, Welcome to your dashboard!</h1>
+
+        <div class="button-container">
+            <% names.forEach((name, index) => { %>
+                <div class="button-wrapper">
+                    <span class="btn-number"><%= index + 1 %></span>
+                    <a href="/with/<%= randomCode %>/<%= encodeURIComponent(name) %>" 
+                       class="btn-name" 
+                       data-name="<%= name %>"
+                       onclick="handleClick(event, this)">
+                        <%= name %>
+                    </a>
+                </div>
+            <% }) %>
+        </div>
+
+        <button class="btn-back" onclick="window.location.href='/with/<%= randomCode %>'">Back to Code</button>
+    </div>
+
+    <script>
+        // Load clicked buttons from localStorage
+        window.onload = function() {
+            const clickedButtons = JSON.parse(localStorage.getItem('clickedButtons')) || [];
+            const buttons = document.querySelectorAll('.btn-name');
+
+            buttons.forEach(button => {
+                const buttonName = button.getAttribute('data-name');
+                if (clickedButtons.includes(buttonName)) {
+                    button.classList.add('active');
+                }
+            });
+        };
+
+        // Handle button click
+        function handleClick(event, element) {
+            // Prevent default navigation
+            event.preventDefault();
+
+            // Add 'active' class to the clicked button
+            element.classList.add('active');
+
+            // Save the clicked button's data-name to localStorage
+            const buttonName = element.getAttribute('data-name');
+            const clickedButtons = JSON.parse(localStorage.getItem('clickedButtons')) || [];
+
+            if (!clickedButtons.includes(buttonName)) {
+                clickedButtons.push(buttonName);
+                localStorage.setItem('clickedButtons', JSON.stringify(clickedButtons));
+            }
+
+            // Navigate to the URL
+            window.location.href = element.href;
+        }
+    </script>
+</body>
+</html>

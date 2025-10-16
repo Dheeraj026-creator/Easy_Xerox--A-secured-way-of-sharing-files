@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xerox Shop Admin Panel</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+</head>
+<style>
+    /* General Reset */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Arial', sans-serif;
+        color: #2c3e50;
+        background: linear-gradient(to bottom, #f9f9f9, #ecf0f1);
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .admin-panel {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    /* Header Styling */
+    .header {
+        background: linear-gradient(45deg, #3498db, #2980b9);
+        color: white;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .header h1 {
+        font-size: 24px;
+        letter-spacing: 1px;
+    }
+
+    /* Navbar Styling */
+    .navbar {
+        background: #ecf0f1;
+        padding: 10px 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar ul {
+        display: flex;
+        justify-content: center;
+        list-style-type: none;
+    }
+
+    .navbar ul li {
+        margin: 0 15px;
+    }
+
+    .navbar ul li a {
+        text-decoration: none;
+        color: #2c3e50;
+        font-size: 16px;
+        font-weight: bold;
+        transition: color 0.3s ease-in-out;
+    }
+
+    .navbar ul li a:hover {
+        color: #3498db;
+    }
+
+    /* Main Content Styling */
+    .content {
+        flex-grow: 1;
+        background: white;
+        padding: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .content p {
+        font-size: 18px;
+        line-height: 1.6;
+        color: #7f8c8d;
+    }
+</style>
+<body>
+    <div class="admin-panel">
+        <header class="header">
+            <h1>Welcome to Xerox Shop's Admin Panel</h1>
+        </header>
+        <nav class="navbar">
+            <ul>
+                <li><a href="/generate-link-page">QR Generation</a></li>
+        
+                <% if (!user) { %>
+                    <!-- User is NOT logged in -->
+                    <li><a href="/register">Signup</a></li>
+                    <li><a href="/login">Login</a></li>
+                <% } else { %>
+                    <!-- User is logged in -->
+                    <li><a href="/logout">Logout</a></li>
+                <% } %>
+            </ul>
+        </nav>
+        <main class="content">
+            <p>Manage your shop efficiently with our admin tools.</p>
+        </main>
+    </div>
+</body>
+</html>

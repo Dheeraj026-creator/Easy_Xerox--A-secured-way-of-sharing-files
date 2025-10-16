@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unique Link Generator</title>
+
+<!-- ✅ Use a reliable QRCode library link -->
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+
+<style>
+    /* Reset & Base */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: #f4f7fa; min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* Navbar */
+    .navbar { background-color: #fff; padding: 15px 0; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    .navbar ul { display: flex; justify-content: center; list-style: none; }
+    .navbar ul li { margin: 0 20px; }
+    .navbar ul li a {
+        text-decoration: none;
+        color: #2c3e50;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    .navbar ul li a:hover { color: #3498db; }
+
+    /* Main container */
+    main { flex: 1; display: flex; justify-content: center; align-items: center; padding: 30px; }
+    .link-container {
+        background: #fff;
+        padding: 40px 30px;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        width: 100%;
+        max-width: 480px;
+        text-align: center;
+    }
+
+    /* Headings */
+    .link-container h1 { color: #34495e; margin-bottom: 10px; font-size: 24px; }
+    .link-container h2 { color: #2c3e50; margin-bottom: 15px; font-size: 20px; }
+    .link-container p { color: #7f8c8d; margin-bottom: 20px; }
+
+    /* Link & password display */
+    .link-display {
+        font-size: 16px;
+        color: #2c3e50;
+        background-color: #ecf0f1;
+        padding: 12px;
+        border-radius: 6px;
+        margin: 10px 0;
+        word-wrap: break-word;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 12px 25px;
+        font-size: 16px;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 10px 5px 0 5px;
+        transition: background 0.3s ease;
+    }
+    .btn:hover { opacity: 0.9; }
+
+    #logoutButton { background-color: #e74c3c; }
+    #downloadBtn { background-color: #2ecc71; }
+    .btn.generate { background-color: #3498db; }
+
+    /* QR Code */
+    #qrcode {
+        margin: 20px auto;
+        padding: 20px;
+        background: #ecf0f1;
+        border-radius: 12px;
+        display: inline-block;
+    }
+
+    /* Responsive */
+    @media (max-width: 500px) {
+        .link-container { padding: 30px 20px; }
+        .navbar ul li { margin: 0 12px; }
+    }
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <ul>
+        <li><a href="/">Home</a></li>
+        <% if (!user) { %>
+            <li><a href="/register">Signup</a></li>
+            <li><a href="/login">Login</a></li>
+        <% } else { %>
+            <li><a href="/logout">Logout</a></li>
+        <% } %>
+    </ul>
+</nav>
+
+<!-- Main Content -->
+<main>
+    <div class="link-container">
+        <h1>Hello, <%= user.username %>!</h1>
+        <h2>Your Generated Unique Link</h2>
+        <p>Click "Regenerate Link" to generate a new unique link.</p>
+
+        <!-- Link -->
+        <div class="link-display" id="generatedLink">
+            Link: <%= generatedLink %> 
+            <br><br>
+            <a href="<%= generatedLink %>" target="_blank">Go To Link</a>
+        </div>
+
+        <!-- Password -->
+        <div class="link-display" id="generatedPassword">
+            Password: <%= password %>
+            <span id="passwordText" style="display: none;"><%= password %></span> 
+            <button onclick="copyPassword()">Copy</button>
+            <br><br>
+            <p>Copy and enter this password by visiting the generated link.</p>
+        </div>
+
+        <!-- ✅ Only ONE QR Code container -->
+        <div id="qrcode"></div>
+
+        <!-- Download QR Code Button -->
+        <button id="downloadBtn" class="btn" style="background-color: #2ecc71; display: inline-block; margin-top: 10px;" onclick="downloadQRCode()">
+            Download QR Code
+        </button>
+
+        <form action="/regenerate-link" method="POST">
+            <button type="submit" class="btn generate">Regenerate Link</button>
+        </form>
+    </div>
+</main>
+
+<script>
+    const generatedLink = "<%= generatedLink %>";
+
+    // ✅ Generate QR Code
+    function generateQRCode(link) {
+        const qrcodeContainer = document.getElementById('qrcode');
+        qrcodeContainer.innerHTML = ''; // Clear old QR
+        console.log("Generating QR for:", link);
+
+        new QRCode(qrcodeContainer, {
+            text: link,
+            width: 180,
+            height: 180,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    }
+
+    // ✅ Copy password to clipboard
+    function copyPassword() {
+        const password = document.getElementById('passwordText').innerText;
+        navigator.clipboard.writeText(password)
+            .then(() => alert('Password copied!'))
+            .catch(err => console.error('Copy failed:', err));
+    }
+
+    // ✅ Download QR Code
+    function downloadQRCode() {
+        const canvas = document.querySelector('#qrcode canvas');
+        if (canvas) {
+            const a = document.createElement('a');
+            a.href = canvas.toDataURL('image/png');
+            a.download = 'qrcode.png';
+            a.click();
+        } else {
+            alert("QR Code not found!");
+        }
+    }
+
+    // ✅ Auto-generate QR on page load
+    window.onload = () => generateQRCode(generatedLink);
+</script>
+
+</body>
+</html>
