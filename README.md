@@ -1,2 +1,8 @@
-# Easy_Xerox--A-secured-way-of-sharing-files
-Easy Xerox is a secure web platform for real-time file sharing. Customers upload files via unique session links (e.g., /example/abc) without WhatsApp. Admins access all codes with a password, view, download, or delete files. Built with Node.js, Express, Socket.io, MongoDB, Multer, it ensures instant, organized, and safe file management.
+- Project: Easy Xerox – A simple and secure way to share files.
+- Problem Solved: Eliminates the need for WhatsApp for both shop owners and customers, avoiding clutter, manual sharing, and privacy issues.
+- How It Works: Admin generates a unique link (e.g., /example) with a password. Customers enter a code (e.g., abc) → redirected to /example/abc to upload files instantly.
+- Admin Control: Admin can view, download, or delete files per user code; the password grants access to all active codes.
+- Technology: Built with Node.js, Express.js, Socket.io, MongoDB Atlas, and Multer.
+- Features: Real-time synchronization, QR-based uploads, automatic file expiration.
+- Deployment & Storage: Fully deployed on Render; data securely stored on MongoDB Atlas.
+- Benefits: Saves time, improves efficiency, ensures secure, organized, and modern file sharing for both customers and shop owners.
