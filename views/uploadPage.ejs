@@ -105,6 +105,65 @@
             font-size: 24px;
             color: #ff0000;
         }
+        /* ======= RESPONSIVENESS ======= */
+@media (max-width: 900px) {
+    .container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .upload-section,
+    .files-section {
+        width: 100%;
+        height: auto;
+        min-height: 350px;
+    }
+
+    .btn-submit {
+        font-size: 15px;
+        padding: 10px 16px;
+    }
+
+    h3 {
+        font-size: 18px;
+    }
+
+    #countdown-timer {
+        width: 90%;
+        margin: 20px auto;
+        font-size: 16px;
+    }
+
+    .uploaded-files li {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .uploaded-files li a,
+    .uploaded-files li button {
+        margin-top: 5px;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        padding: 20px;
+    }
+
+    .btn-submit {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+
+    #countdown-timer {
+        font-size: 14px;
+        padding: 8px;
+    }
+}
     </style>
 </head>
 <body>
