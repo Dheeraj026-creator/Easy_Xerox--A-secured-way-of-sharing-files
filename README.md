@@ -6,7 +6,7 @@
 Easy Xerox eliminates the need for WhatsApp for both shop owners and customers, avoiding clutter, manual sharing, and privacy issues. It allows secure, real-time file sharing through unique links and QR codes.
 
 ---
-
+**Live Demo:** [Click here to see the project](https://easy-xerox-a-secured-way-of-sharing-files.onrender.com)
 ## How It Works
 - Admin generates a unique link (e.g., `/example`) with a password  
 - Customers enter a code (e.g., `abc`) → redirected to `/example/abc` to upload files instantly  
@@ -102,7 +102,7 @@ Open [http://localhost:5000](http://localhost:5000) in your browser to use the a
 ### QR Generation
 - After login, users can generate a QR code  
 - The page provides:  
-  - The generated link for the user (https://xeroxshop-1.onrender.com/generatedlink)  
+  - The generated link for the user (http://localhost:5000/generatedlink)  
   - An associated password  
   - A downloadable QR image  
   - An option to regenerate the link if needed  
@@ -112,15 +112,16 @@ Open [http://localhost:5000](http://localhost:5000) in your browser to use the a
 ### Customer File Upload
 - On the generated link page, customers can enter a desired code (e.g., `abc` or `dhee`)  
 - They are redirected to:  
-https://xeroxshop-1.onrender.com/example/<entered-code>
+  http://localhost:5000/generatedlink/abc
+  in this url user can upload their file 
 
-markdown
-Copy code
+
 - Users can upload files (images, PDFs, PPTs, etc.)  
 
 ### Admin Access
 - If the entered code matches the associated password, it redirects to the admin page:  
 https://xeroxshop-1.onrender.com/example/<assopassword>
+here the codes enteres by the users are listed in the form of buttons by clicking that the admin can download and print files 
 
 yaml
 Copy code
@@ -129,14 +130,3 @@ Copy code
 - Files are automatically deleted after 2 minutes  
 
 ---
-✅ Features in this version:
-
-Centered project title and subtitle
-
-Horizontal rules (---) to separate sections
-
-Lists use - for compatibility
-
-Code blocks for commands and URLs
-
-Fully copy-friendly for GitHub Markdown
